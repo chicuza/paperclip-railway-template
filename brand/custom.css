@@ -135,6 +135,39 @@ aside .flex.items-center > svg.h-4.w-4,
 aside .flex.items-center > svg.h-5.w-5,
 nav .flex.items-center > svg.h-4.w-4 { display: none !important; }
 
+/* ----------------------------------------------------------------
+   Paperclip app brand icon at top of sidebar header.
+   Pattern: <aside><header><button|div with svg paperclip><span>Amabile AI</span></header>
+   Strategy: kill any SVG in the very first flex container of aside header,
+   then inject Amabile glyph via :before on its parent.
+   ---------------------------------------------------------------- */
+aside header svg:not([class*="lucide-search"]):not([class*="lucide-bell"]):not([class*="lucide-x"]),
+aside > div:first-child > div:first-child > *:first-child svg:first-of-type,
+aside > div:first-child button[class*="rounded"]:first-child svg,
+aside [class*="brand"] svg,
+aside [aria-label*="workspace" i] svg,
+aside [aria-label*="paperclip" i] svg,
+aside [aria-label*="home" i]:first-of-type svg {
+  display: none !important;
+}
+
+/* Inject Amabile glyph into the brand button/wrapper.
+   Targets the first square clickable element in the aside header
+   that contained the original Paperclip SVG. */
+aside > div:first-child > div:first-child > *:first-child,
+aside header > *:first-child,
+aside [class*="brand"]:first-of-type {
+  position: relative;
+}
+aside > div:first-child > div:first-child > *:first-child::before,
+aside header > *:first-child::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/static/squadra/logo-glyph-transparent.png') center / 70% no-repeat;
+  pointer-events: none;
+}
+
 aside span.text-sm.font-medium:first-of-type,
 aside span.font-semibold:first-of-type,
 nav span.text-sm.font-medium:first-of-type {
