@@ -106,19 +106,34 @@ html, body, button, input, textarea, select {
 .badge-running { animation: amb-pulse-ring 1.6s ease-out infinite; }
 
 /* ============================================================
-   Squadra logo placements
-   - Sparkles icon + small wordmark span (Paperclip SPA pattern):
-       <div class="flex items-center gap-2 mb-8">
-         <svg class="h-4 w-4 ...">  ← sparkles icon
-         <span class="text-sm font-medium">Squadra</span>
-       </div>
-     → hide the svg, replace span text with Amabile horizontal lockup as bg image.
-   - Auth page gets vertical lockup as splash above the form.
+   Squadra logo placements (Paperclip SPA wordmark pattern):
+     <div class="flex items-center gap-2 mb-8">
+       <svg class="h-4 w-4 ...">   ← sparkles icon (Kv)
+       <span class="text-sm font-medium">Squadra</span>
+     </div>
+   Used in BOTH the auth header AND the left sidebar header.
+   Strategy: hide sparkles, replace text-span with Amabile horizontal lockup.
    ============================================================ */
 
-/* Hide sparkles icon next to wordmark, show Amabile horizontal lockup */
 .flex.items-center.gap-2.mb-8 > svg.h-4.w-4 { display: none !important; }
 .flex.items-center.gap-2.mb-8 > span.text-sm.font-medium {
+  font-size: 0 !important;
+  background: url('/static/squadra/logo-horizontal.jpeg') left center / contain no-repeat;
+  display: inline-block !important;
+  width: 200px;
+  height: 36px;
+  text-indent: -9999px;
+  overflow: hidden;
+}
+
+/* Sidebar (aside) wordmark — broader fallback for nav locations */
+aside .flex.items-center > svg.h-4.w-4,
+aside .flex.items-center > svg.h-5.w-5,
+nav .flex.items-center > svg.h-4.w-4 { display: none !important; }
+
+aside span.text-sm.font-medium:first-of-type,
+aside span.font-semibold:first-of-type,
+nav span.text-sm.font-medium:first-of-type {
   font-size: 0 !important;
   background: url('/static/squadra/logo-horizontal.jpeg') left center / contain no-repeat;
   display: inline-block !important;
@@ -128,8 +143,12 @@ html, body, button, input, textarea, select {
   overflow: hidden;
 }
 
-/* Auth page gradient background + vertical lockup splash */
-body:has(form input[type="email"][type="password"]),
+/* ============================================================
+   Auth page: BIG vertical lockup as primary visual
+   ============================================================ */
+
+/* Gradient background, full viewport */
+body:has(form input[type="email"]),
 [data-route="auth"],
 .login-container,
 .auth-container,
@@ -141,26 +160,45 @@ main:has(form input[type="email"]) {
   min-height: 100vh;
 }
 
-/* Vertical lockup splash above the auth form */
-main:has(form input[type="email"])::before {
+/* On the auth page, hide the small wordmark (horizontal logo via :before above)
+   and show the LARGE vertical lockup splash instead */
+main:has(form input[type="email"]) .flex.items-center.gap-2.mb-8 {
+  display: none !important;
+}
+
+/* Inject big vertical lockup as background of the auth container */
+main:has(form input[type="email"]) > div:first-child::before,
+[data-route="auth"]::before,
+form:has(input[type="email"]):has(input[type="password"])::before {
   content: '';
   display: block;
-  width: 200px;
-  height: 200px;
-  margin: 2rem auto 1.5rem;
+  width: 280px;
+  height: 280px;
+  margin: 1rem auto 2rem;
   background: url('/static/squadra/logo-vertical.jpeg') center / contain no-repeat;
 }
 
-/* Subtle "by Amabile AI" footer attribution, non-intrusive */
+/* Card with form gets a soft elevation on the gradient backdrop */
+main:has(form input[type="email"]) form {
+  background: rgb(255 255 255 / 0.92) !important;
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius) !important;
+  padding: 2rem !important;
+  box-shadow: 0 12px 40px rgb(29 26 54 / 0.10);
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* Subtle "by Amabile AI" footer attribution */
 body::after {
   content: 'Squadra by Amabile AI';
   display: block;
   position: fixed;
-  bottom: 6px;
-  right: 12px;
+  bottom: 8px;
+  right: 14px;
   font: 500 10px 'Inter', sans-serif;
   color: var(--amb-gray-600);
-  opacity: 0.6;
+  opacity: 0.55;
   pointer-events: none;
   z-index: 9999;
 }

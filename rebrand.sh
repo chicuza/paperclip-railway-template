@@ -72,6 +72,8 @@ patch_spa_dist() {
     # Lowercase case label `case"paperclip"` → `case"squadra"` (icon mapping)
     safe_sed '"paperclip"'                                                       "\"squadra\""                                                        "$f" spa-js-case
     safe_sed 'Paperclip managed'                                                 "${BRAND_NAME} managed"                                              "$f" spa-js
+    # Force LIGHT theme as default (was: stored : "dark")
+    safe_sed 'stored : "dark"'                                                   'stored : "light"'                                                   "$f" spa-theme-default
   done < <(find "$SPA_DIST" \( -name '*.html' -o -name '*.json' -o -name '*.js' \) -print0)
 }
 

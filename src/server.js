@@ -337,6 +337,12 @@ const app = express();
 // Squadra brand assets — served by wrapper before proxy delegates everything else
 app.use("/static/squadra", express.static("/wrapper/public/static/squadra", { maxAge: "1h" }));
 
+// Root-level favicon/manifest overrides (browsers fetch /favicon.ico regardless of <link rel=icon>)
+app.get("/favicon.ico", (_req, res) => res.sendFile("/wrapper/public/static/squadra/favicon.ico"));
+app.get("/favicon.svg", (_req, res) => res.sendFile("/wrapper/public/static/squadra/favicon-96x96.png"));
+app.get("/apple-touch-icon.png", (_req, res) => res.sendFile("/wrapper/public/static/squadra/apple-touch-icon.png"));
+app.get("/site.webmanifest", (_req, res) => res.sendFile("/wrapper/public/static/squadra/squadra-manifest.webmanifest"));
+
 const proxy = httpProxy.createProxyServer({
   target: PAPERCLIP_TARGET,
   ws: true,
