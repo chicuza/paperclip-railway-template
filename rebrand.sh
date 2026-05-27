@@ -64,9 +64,14 @@ patch_spa_dist() {
     # JSON manifest fields (quoted exact match)
     safe_sed '"name":[[:space:]]*"Paperclip"'                                    "\"name\": \"${BRAND_NAME}\""                                        "$f" spa-manifest
     safe_sed '"short_name":[[:space:]]*"Paperclip"'                              "\"short_name\": \"${BRAND_NAME}\""                                  "$f" spa-manifest
-    # JS user-facing copy (quoted strings only, never bare identifiers)
+    # JS user-facing copy (quoted strings only, never bare identifiers — `paperclipReady` survives)
     safe_sed 'Sign in to Paperclip'                                              "Sign in to ${BRAND_NAME}"                                           "$f" spa-js
     safe_sed 'Create your Paperclip account'                                     "Create your ${BRAND_NAME} account"                                  "$f" spa-js
+    # Bare quoted string — catches React children, document.title="Paperclip", labels, etc.
+    safe_sed '"Paperclip"'                                                       "\"${BRAND_NAME}\""                                                  "$f" spa-js-strings
+    # Lowercase case label `case"paperclip"` → `case"squadra"` (icon mapping)
+    safe_sed '"paperclip"'                                                       "\"squadra\""                                                        "$f" spa-js-case
+    safe_sed 'Paperclip managed'                                                 "${BRAND_NAME} managed"                                              "$f" spa-js
   done < <(find "$SPA_DIST" \( -name '*.html' -o -name '*.json' -o -name '*.js' \) -print0)
 }
 
