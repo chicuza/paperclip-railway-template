@@ -111,14 +111,18 @@ html, body, button, input, textarea, select {
        <svg class="h-4 w-4 ...">   ← sparkles icon (Kv)
        <span class="text-sm font-medium">Squadra</span>
      </div>
-   Used in BOTH the auth header AND the left sidebar header.
-   Strategy: hide sparkles, replace text-span with Amabile horizontal lockup.
+   Used ONLY in sidebar/header inside the app (not auth page).
+   Strategy: hide sparkles, replace text-span with Amabile horizontal lockup PNG (transparent).
    ============================================================ */
 
+/* Auth page: suppress the small header wordmark entirely — vertical lockup below replaces it */
+main:has(form input[type="email"]) .flex.items-center.gap-2.mb-8 { display: none !important; }
+
+/* App sidebar / nav wordmark — show horizontal lockup (transparent PNG) */
 .flex.items-center.gap-2.mb-8 > svg.h-4.w-4 { display: none !important; }
 .flex.items-center.gap-2.mb-8 > span.text-sm.font-medium {
   font-size: 0 !important;
-  background: url('/static/squadra/logo-horizontal.jpeg') left center / contain no-repeat;
+  background: url('/static/squadra/logo-horizontal-transparent.png') left center / contain no-repeat;
   display: inline-block !important;
   width: 200px;
   height: 36px;
@@ -135,7 +139,7 @@ aside span.text-sm.font-medium:first-of-type,
 aside span.font-semibold:first-of-type,
 nav span.text-sm.font-medium:first-of-type {
   font-size: 0 !important;
-  background: url('/static/squadra/logo-horizontal.jpeg') left center / contain no-repeat;
+  background: url('/static/squadra/logo-horizontal-transparent.png') left center / contain no-repeat;
   display: inline-block !important;
   width: 180px;
   height: 32px;
@@ -160,22 +164,37 @@ main:has(form input[type="email"]) {
   min-height: 100vh;
 }
 
-/* On the auth page, hide the small wordmark (horizontal logo via :before above)
-   and show the LARGE vertical lockup splash instead */
-main:has(form input[type="email"]) .flex.items-center.gap-2.mb-8 {
+/* Hide any decorative sidebar/panel elements that leak into the auth layout */
+main:has(form input[type="email"]) aside,
+main:has(form input[type="email"]) nav,
+body:has(form input[type="email"]) aside,
+body:has(form input[type="email"]) [class*="sidebar"],
+body:has(form input[type="email"]) [class*="Sidebar"],
+body:has(form input[type="email"]) [class*="panel"],
+body:has(form input[type="email"]) [class*="decoration"] {
   display: none !important;
 }
 
-/* Inject big vertical lockup as background of the auth container */
+/* Inject big vertical lockup (transparent PNG) above the auth form — no white card */
 main:has(form input[type="email"]) > div:first-child::before,
 [data-route="auth"]::before,
 form:has(input[type="email"]):has(input[type="password"])::before {
   content: '';
   display: block;
-  width: 280px;
-  height: 280px;
-  margin: 1rem auto 2rem;
-  background: url('/static/squadra/logo-vertical.jpeg') center / contain no-repeat;
+  width: 340px;
+  height: 340px;
+  margin: 1.5rem auto 2rem;
+  background: url('/static/squadra/logo-vertical-transparent.png') center / contain no-repeat;
+  /* No background-color — transparent PNG sits directly on gradient */
+}
+
+/* Responsive: shrink lockup on small viewports */
+@media (max-width: 480px) {
+  main:has(form input[type="email"]) > div:first-child::before,
+  form:has(input[type="email"]):has(input[type="password"])::before {
+    width: 220px;
+    height: 220px;
+  }
 }
 
 /* Card with form gets a soft elevation on the gradient backdrop */

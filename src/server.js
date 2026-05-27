@@ -338,7 +338,15 @@ const app = express();
 app.use("/static/squadra", express.static("/wrapper/public/static/squadra", { maxAge: "1h" }));
 
 // Root-level favicon/manifest overrides (browsers fetch /favicon.ico regardless of <link rel=icon>)
-app.get("/favicon.ico", (_req, res) => res.sendFile("/wrapper/public/static/squadra/favicon.ico"));
+// Prefer transparent PNG glyph; fall back to ICO if PNG not present yet
+app.get("/favicon.ico", (_req, res) => {
+  const pngPath = "/wrapper/public/static/squadra/logo-glyph-transparent.png";
+  if (fs.existsSync(pngPath)) {
+    res.type("image/png").sendFile(pngPath);
+  } else {
+    res.sendFile("/wrapper/public/static/squadra/favicon.ico");
+  }
+});
 app.get("/favicon.svg", (_req, res) => res.sendFile("/wrapper/public/static/squadra/favicon-96x96.png"));
 app.get("/apple-touch-icon.png", (_req, res) => res.sendFile("/wrapper/public/static/squadra/apple-touch-icon.png"));
 app.get("/site.webmanifest", (_req, res) => res.sendFile("/wrapper/public/static/squadra/squadra-manifest.webmanifest"));
