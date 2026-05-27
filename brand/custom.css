@@ -1,0 +1,133 @@
+/*
+ * Squadra brand overlay (Amabile AI)
+ * Injected by Cloudflare Worker on squadra.amabileai.com.br
+ * Token palette from C:/Users/chicu/Downloads/guia de cores amabile.jpeg
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Brand palette (oficial) */
+  --amb-purple-400:  #A78BFA;
+  --amb-purple-700:  #7C3AED;
+  --amb-pink-500:    #EC4899;
+  --amb-pink-700:    #BE185D;
+  --amb-orange-500:  #FB923C;
+  --amb-charcoal:    #1D1A36;
+  --amb-gray-600:    #6B7280;
+  --amb-gray-200:    #E5E7EB;
+  --amb-cream:       #FDF6F3;
+  --amb-lavender:    #EDD4F2;
+  --amb-peach:       #FFD4CF;
+  --amb-sky:         #C4E0F9;
+
+  /* Semantic tokens (light) */
+  --background:           var(--amb-cream);
+  --foreground:           var(--amb-charcoal);
+  --card:                 #FFFFFF;
+  --card-foreground:      var(--amb-charcoal);
+  --popover:              #FFFFFF;
+  --popover-foreground:   var(--amb-charcoal);
+  --primary:              var(--amb-purple-400);
+  --primary-foreground:   var(--amb-charcoal);
+  --secondary:            var(--amb-lavender);
+  --secondary-foreground: var(--amb-charcoal);
+  --muted:                #F5F3FF;
+  --muted-foreground:     var(--amb-gray-600);
+  --accent:               var(--amb-peach);
+  --accent-foreground:    var(--amb-charcoal);
+  --destructive:          var(--amb-pink-700);
+  --destructive-foreground: #FFFFFF;
+  --border:               var(--amb-gray-200);
+  --input:                var(--amb-gray-200);
+  --ring:                 var(--amb-purple-400);
+  --radius:               0.75rem;
+}
+
+.dark {
+  --background:           #18181B;
+  --foreground:           #F9FAFB;
+  --card:                 #27243F;
+  --card-foreground:      #F9FAFB;
+  --popover:              #27243F;
+  --popover-foreground:   #F9FAFB;
+  --primary:              var(--amb-purple-400);
+  --primary-foreground:   var(--amb-charcoal);
+  --secondary:            #2D2748;
+  --secondary-foreground: #F9FAFB;
+  --muted:                #2D2748;
+  --muted-foreground:     #D1D5DB;
+  --accent:               #3B2E5C;
+  --accent-foreground:    #F9FAFB;
+  --destructive:          var(--amb-pink-500);
+  --destructive-foreground: var(--amb-charcoal);
+  --border:               #3D3660;
+  --input:                #3D3660;
+  --ring:                 var(--amb-purple-400);
+}
+
+/* Typography */
+html, body, button, input, textarea, select {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Focus ring */
+:where(*):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(167 139 250 / 0.55);
+  border-radius: 6px;
+}
+
+/* Selection */
+::selection { background: var(--amb-lavender); color: var(--amb-charcoal); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgb(107 114 128 / 0.35);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--amb-purple-400); }
+
+/* Status badge palette (semantic, not brand) */
+.badge-idle      { background:#EDE9FE; color:#5B21B6; }
+.badge-running   { background:var(--amb-purple-400); color:#FFFFFF; }
+.badge-succeeded { background:#DCFCE7; color:#16A34A; }
+.badge-error,
+.badge-failed    { background:#FCE7F3; color:var(--amb-pink-700); }
+.badge-queued    { background:#FFF7ED; color:#C2410C; }
+
+@keyframes amb-pulse-ring {
+  0%   { box-shadow: 0 0 0 0   rgb(167 139 250 / 0.6); }
+  70%  { box-shadow: 0 0 0 6px rgb(167 139 250 / 0.0); }
+  100% { box-shadow: 0 0 0 0   rgb(167 139 250 / 0.0); }
+}
+.badge-running { animation: amb-pulse-ring 1.6s ease-out infinite; }
+
+/* Auth page gradient + vertical lockup logo */
+.login-container, .auth-container, [data-route="auth"], main:has(form input[type="email"]) {
+  background: linear-gradient(135deg,
+    var(--amb-lavender) 0%,
+    var(--amb-cream)    50%,
+    var(--amb-peach)    100%);
+  min-height: 100vh;
+}
+
+form:has(input[type="email"]):has(input[type="password"]) {
+  padding-top: 8rem;
+  background: rgb(255 255 255 / 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem 2rem;
+  box-shadow: 0 8px 32px rgb(29 26 54 / 0.08);
+}
+
+form:has(input[type="email"]):has(input[type="password"])::before {
+  content: '';
+  display: block;
+  width: 200px;
+  height: 200px;
+  margin: -6rem auto 1.5rem;
+  background: url('/static/squadra/logo-vertical.jpeg') center / contain no-repeat;
+}

@@ -52,10 +52,23 @@ COPY scripts/entrypoint.sh /wrapper/entrypoint.sh
 COPY scripts/bootstrap-ceo.mjs /wrapper/template/bootstrap-ceo.mjs
 RUN chmod +x /wrapper/entrypoint.sh
 
+# Squadra (Amabile AI) rebrand — runs at build time. Idempotent.
+# Patches built SPA at /app/ui/dist + wrapper setup HTML + copies brand assets to /wrapper/public/static/squadra.
+COPY brand /rebrand/brand
+COPY rebrand.sh /rebrand/rebrand.sh
+RUN chmod +x /rebrand/rebrand.sh \
+    && SPA_DIST=/app/ui/dist \
+       WRAPPER_DIR=/wrapper \
+       WRAPPER_SRC=/wrapper/src \
+       BRAND_DIR=/rebrand/brand \
+       WRAPPER_PUBLIC=/wrapper/public/static/squadra \
+       ROOT=/rebrand \
+       bash /rebrand/rebrand.sh
+
 # Optional local adapters/tools parity with upstream Dockerfile.
 RUN npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest opencode-ai
 RUN npm install --global --omit=dev tsx
-RUN mkdir -p /paperclip \
+RUN mkdir -p /paperclip /wrapper/public/static/squadra \
     && chown -R node:node /app /paperclip /wrapper
 
 # Railway sets PORT at runtime and this process binds to it.

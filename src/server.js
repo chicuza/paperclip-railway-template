@@ -333,6 +333,10 @@ function runCodexLogin() {
 }
 
 const app = express();
+
+// Squadra brand assets — served by wrapper before proxy delegates everything else
+app.use("/static/squadra", express.static("/wrapper/public/static/squadra", { maxAge: "1h" }));
+
 const proxy = httpProxy.createProxyServer({
   target: PAPERCLIP_TARGET,
   ws: true,
