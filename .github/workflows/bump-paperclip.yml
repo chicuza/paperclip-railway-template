@@ -1,0 +1,68 @@
+name: bump-paperclip
+
+# Keeps the Paperclip pin (Dockerfile ARG PAPERCLIP_REF on the `squadra`
+# deploy branch) current with the latest STABLE upstream release.
+# Opens a PR for human review — never auto-merges. Scheduled workflows only
+# run from the default branch, so this file lives on `main` but operates on `squadra`.
+
+on:
+  schedule:
+    - cron: "0 13 * * 1" # Mondays 13:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout squadra (deploy branch)
+        uses: actions/checkout@v4
+        with:
+          ref: squadra
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Resolve latest stable release and bump Dockerfile
+        id: bump
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/bump-paperclip-ref.mjs
+          if git diff --quiet -- Dockerfile; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            NEW="$(grep -oE 'PAPERCLIP_REF=[^[:space:]]+' Dockerfile | head -1 | cut -d= -f2)"
+            echo "changed=true"  >> "$GITHUB_OUTPUT"
+            echo "newref=$NEW"    >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open PR against squadra
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BR="chore/bump-paperclip-${{ steps.bump.outputs.newref }}"
+          git config user.name  "paperclip-bump-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BR"
+          git add Dockerfile
+          git commit -m "chore: bump Paperclip to ${{ steps.bump.outputs.newref }}"
+          git push -f origin "$BR"
+          gh pr create --base squadra --head "$BR" \
+            --title "chore: bump Paperclip to ${{ steps.bump.outputs.newref }} (latest stable)" \
+            --body "$(cat <<'BODY'
+Automated bump to the latest **stable** upstream release (resolved via `scripts/bump-paperclip-ref.mjs` → GitHub `releases/latest`; never master/canary).
+
+### GATE before merge (merge triggers a Railway rebuild + forward-only migrations on boot)
+- [ ] Review the new migrations in the upstream release notes for the version range
+- [ ] **Backup the Railway Postgres** (snapshot / pg_dump)
+- [ ] Confirm `rebrand.sh` still targets `/app/ui/dist` (UI build path unchanged)
+- [ ] After deploy: `/setup/healthz` ok · `<title>Squadra` · `/static/squadra/*` 200 · companies/agents intact
+BODY
+)" || echo "PR creation failed — ensure repo Settings → Actions → 'Allow GitHub Actions to create and approve pull requests' is enabled."
